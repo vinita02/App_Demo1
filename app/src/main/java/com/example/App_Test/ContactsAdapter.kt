@@ -5,10 +5,12 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.row_contact.view.*
 
 class ContactsAdapter(val mContext: Context, val mData: MutableList<contact_Entity>):RecyclerView.Adapter<ContactsAdapter.ViewHolder> () {
@@ -28,6 +30,8 @@ val v = LayoutInflater.from(mContext).inflate(R.layout.row_contact,parent,false)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.name.text = mData[position].name
         holder.number.text = mData[position].number.toString()
+
+        Glide.with(this!!.mContext!!).load(this!!.mData!![position].img).into(holder.image)
 
         holder.idLinear.setOnClickListener{
 
@@ -54,5 +58,7 @@ val v = LayoutInflater.from(mContext).inflate(R.layout.row_contact,parent,false)
         var   number:TextView = itemView.tv_number
 
         var idLinear = itemView.findViewById<RelativeLayout>(R.id.idLinear)
+
+        var image = itemView.findViewById<ImageView>(R.id.image)
     }
 }

@@ -2,7 +2,9 @@ package com.example.App_Test
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
@@ -14,12 +16,15 @@ import kotlinx.android.synthetic.main.row_contact.*
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
+import java.io.FileOutputStream
 
 class SecondActivity : AppCompatActivity() {
 
      var name:String? = null
     var number:String? = null
     val SELECTIMAGE = 100
+    var bitmap: Bitmap? = null
+    var image:String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +37,7 @@ class SecondActivity : AppCompatActivity() {
             intent.type = "image/*"
             intent.action = Intent.ACTION_GET_CONTENT
             startActivityForResult(Intent.createChooser(intent, "Select Picture"),SELECTIMAGE)
+           /* bitmap = image_sencond_activity*/
         }
 
 
@@ -40,19 +46,13 @@ class SecondActivity : AppCompatActivity() {
              name = et_Name.text.toString()
              number = et_Number.text.toString()
 
-            var contact = contact_Entity(0,name.toString(),number!!.toInt())
+            var img = image
+
+            var contact = contact_Entity(0,name.toString(),number!!.toInt(),img!!)
 
 
             Thread{
-
-
                 db.contact_dao().saveContact(contact)
-
-                /* db.contact_dao().readContact().forEach(){
-                     Log.i("Fetch Records", "Id:  : ${it.id}")
-                     Log.i("Fetch Records", "Name:  : ${it.name}")
-                     Log.i("Fetech Recored","Dept: :${it.number}")
-                 }*/
 
             }.start()
 
@@ -71,11 +71,54 @@ class SecondActivity : AppCompatActivity() {
         if (resultCode == RESULT_OK)
         {
             if (requestCode == SELECTIMAGE)
-            { val selectedImageUri = data!!.getData()
+            {
+               /* val selectedImageUri = data!!.getData()
+                image_sencond_activity.setImageURI(selectedImageUri)*/
+
+                val selectedImageUri = data!!.data
                 image_sencond_activity.setImageURI(selectedImageUri)
+                val bitmap = getContactBitmapFromURI(this, Uri.parse(selectedImageUri.toString()))
+                val folderPath = saveBitmapIntoSDCardImage(this, bitmap!!)
+                image = folderPath.toString()
+                image_sencond_activity.setImageBitmap(bitmap)
             }
 
         }
 
+    }
+
+    fun getContactBitmapFromURI(context: Context, uri: Uri): Bitmap? {
+        try {
+            val input = context.getContentResolver().openInputStream(uri) ?: return null
+            return BitmapFactory.decodeStream(input)
+        } catch (e: FileNotFoundException) {
+
+        }
+
+        return null
+
+    }
+
+    fun saveBitmapIntoSDCardImage(context: Context, finalBitmap: Bitmap): File {
+        val mFolder = File("${getExternalFilesDir(null)?.absolutePath}/sample")
+        val imgFile = File(mFolder.absolutePath + "/${System.currentTimeMillis()}.png")
+        if (!mFolder.exists()) {
+            mFolder.mkdir()
+        }
+        if (!imgFile.exists()) {
+            imgFile.createNewFile()
+        }
+
+        try {
+            val out = FileOutputStream(imgFile)
+            finalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
+           // Log.d("Check ","Img"+imgFile)
+            out.flush()
+            out.close()
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return imgFile
     }
 }
