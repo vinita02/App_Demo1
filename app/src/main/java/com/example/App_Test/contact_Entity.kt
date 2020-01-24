@@ -14,7 +14,7 @@ data class contact_Entity (
     var name: String ,
 
     @ColumnInfo(name = "Number")
-    var number: Int,
+    var number: String,
     @ColumnInfo(name = "IMAGE")var img:String
 
     )

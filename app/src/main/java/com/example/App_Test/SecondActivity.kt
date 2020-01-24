@@ -45,10 +45,9 @@ class SecondActivity : AppCompatActivity() {
 
              name = et_Name.text.toString()
              number = et_Number.text.toString()
-
             var img = image
 
-            var contact = contact_Entity(0,name.toString(),number!!.toInt(),img!!)
+            var contact = contact_Entity(0,name.toString(),number!!.toString(),img!!)
 
 
             Thread{
