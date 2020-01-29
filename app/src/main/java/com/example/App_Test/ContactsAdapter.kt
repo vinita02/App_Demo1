@@ -13,13 +13,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.row_contact.view.*
 
-class ContactsAdapter(val mContext: Context, val mData: MutableList<contact_Entity>):RecyclerView.Adapter<ContactsAdapter.ViewHolder> () {
+class ContactsAdapter(val mContext: Context, val mData: MutableList<contact_Entity>,listener: OnItemClickListener):RecyclerView.Adapter<ContactsAdapter.ViewHolder> () {
 
-    lateinit var address: String
+    var listenerContact: OnItemClickListener = listener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 
-val v = LayoutInflater.from(mContext).inflate(R.layout.row_contact,parent,false)
+        val v = LayoutInflater.from(mContext).inflate(R.layout.row_contact,parent,false)
         return ViewHolder(v)
     }
 
@@ -28,19 +28,23 @@ val v = LayoutInflater.from(mContext).inflate(R.layout.row_contact,parent,false)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
+        var currentContact: contact_Entity = mData[position]
         holder.name.text = mData[position].name
         holder.number.text = mData[position].number.toString()
 
+        holder.bind(currentContact,listenerContact)
+
         Glide.with(this!!.mContext!!).load(this!!.mData!![position].img).into(holder.image)
 
-        holder.idLinear.setOnClickListener{
+       /* holder.idLinear.setOnClickListener{
 
             mData!!.get(position).id
             val intent = Intent(mContext, SecondActivity::class.java)
             intent.putExtra("id_value", mData!!.get(position).id)
             mContext?.startActivity(intent)
 
-        }
+        }*/
 
 
     }
@@ -49,6 +53,10 @@ val v = LayoutInflater.from(mContext).inflate(R.layout.row_contact,parent,false)
         mData.clear()
         mData.addAll(address)
         notifyDataSetChanged()
+    }
+
+    interface OnItemClickListener{
+        fun onItemClick(contact:contact_Entity)
     }
 
 
@@ -60,5 +68,11 @@ val v = LayoutInflater.from(mContext).inflate(R.layout.row_contact,parent,false)
         var idLinear = itemView.findViewById<RelativeLayout>(R.id.idLinear)
 
         var image = itemView.findViewById<ImageView>(R.id.image)
+
+        fun bind(contact: contact_Entity, listener: OnItemClickListener) {
+            idLinear.setOnClickListener {
+                listener.onItemClick(contact)
+            }
+        }
     }
 }

@@ -7,7 +7,8 @@ import android.util.Log
 import androidx.room.Room
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),ContactsAdapter.OnItemClickListener {
+
 
     lateinit var myAdapter:ContactsAdapter
 
@@ -21,7 +22,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        myAdapter = ContactsAdapter(this, mutableListOf())
+        myAdapter = ContactsAdapter(this, mutableListOf(),this)
         recycler.adapter = myAdapter
 
 
@@ -39,5 +40,11 @@ class MainActivity : AppCompatActivity() {
 
         }
         thread.start()
+    }
+
+    override fun onItemClick(contact: contact_Entity) {
+        var intent = Intent(applicationContext, SecondActivity::class.java)
+        intent.putExtra("id", contact.id)
+        startActivity(intent)
     }
 }
